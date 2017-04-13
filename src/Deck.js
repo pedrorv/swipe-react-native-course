@@ -13,7 +13,8 @@ const SWIPE_OUT_DURATION = 300
 class Deck extends Component {
   static defaultProps = {
     onSwipeRight: () => {},
-    onSwipeLeft: () => {}
+    onSwipeLeft: () => {},
+    renderNoMoreCards: () => {}
   }
 
   constructor(props) {
@@ -52,7 +53,9 @@ class Deck extends Component {
     const { onSwipeLeft, onSwipeRight, data } = this.props
     const item = data[this.state.index]
 
-    (direction === 'right') ? onSwipeRight(item) : onSwipeLeft(item)
+    ;(direction === 'right') ? onSwipeRight(item) : onSwipeLeft(item)
+    this.state.position.setValue({ x: 0, y: 0 })
+    this.setState({ index: this.state.index + 1 })
   }
 
   resetPosition() {
@@ -77,8 +80,16 @@ class Deck extends Component {
   }
 
   renderCards() {
-    return this.props.data.map((card, index) => {
-      if (index === 0) {
+    if (this.state.index >= this.props.data.length) {
+      return this.props.renderNoMoreCards()
+    }
+
+    return this.props.data.map((card, i) => {
+      if (i < this.state.index) {
+        return null
+      }
+      
+      if (i === this.state.index) {
         return (
           <Animated.View 
             style={this.getCardStyle()}
